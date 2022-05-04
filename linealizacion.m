@@ -5,7 +5,7 @@ clear all;clc;close all;
 syms x1 x2 u1 u2 v2 v3 UA Co tv lamb alf V
 
 dx1 = -((UA)/(Co)) *x1 - ((1)/(tv))*x1*u1 - ((lamb)/(Co)) * u2  + ((UA)/(Co))* v2 + ((1)/(tv))*u1*v2;
-dx2 = -((1)/(tv)) * x2*u1 + ((1)/(V)) *u2 + ((1)/(tv))*u1*v3;
+dx2 = -((1)/(tv)) * x2*u1 + ((1)/(V)) *u2 + ((1)/(tv))*u1*v3 ;
 
 % Creación de los vectores para linealizar
 
@@ -42,13 +42,16 @@ v3_p = 12; % gH2O/kg
 % A = [(1/tv)*(x1_p + v2_p) -(lamb/Co); (1/tv)*(x2_p + v3_p) (1/V)];
 % B = [(UA/Co)*x1_p + (UA/Co)*v2_p; -alf*v1_p];
 % C = inv(A)*B;
-% u1 = C(1
-% u2 = C(2
+% u1 = C(1)
+% u2 = C(2)
 
 %x1_p = (  ( (-1*UA/Co) - ((1/tv)*u1_p) )            )   /   (  (lamb/Co)*u2_p - (UA/Co)*v2_p - (1/tv)*u1_p*v2_p  )                 )
-x1_p = ( ((lamb/Co)*u2_p) - ((UA/Co)*v2_p) - ((1/tv)*u1_p*v2_p) - (1/(Co))*v1_p )  /   ( (-UA/Co)- ((1/tv)*u1_p) );
-x2_p = (tv/u1_p)* ( ((1/V)*u2_p) + ((1/tv)*u1_p*v3_p) + (alf*v1_p) );
+x1_p = ( ((lamb/Co)*u2_p) - ((UA/Co)*v2_p) - ((1/tv)*u1_p*v2_p) - (1/(Co))*v1_p )  /   ( (-UA/Co)- ((1/tv)*u1_p) )
+x2_p = (tv/u1_p)* ( ((1/V)*u2_p) + ((1/tv)*u1_p*v3_p) + (alf*v1_p) )
 
+
+% x1_p = ( ((lamb/Co)*u2_p) - ((UA/Co)*v2_p) - ((1/tv)*u1_p*v2_p) )  /   ( (-UA/Co)- ((1/tv)*u1_p) )
+% x2_p = (tv/u1_p)* ( ((1/V)*u2_p) + ((1/tv)*u1_p*v3_p)  )
 % Evaluando...
 
 x1 = x1_p;
@@ -87,7 +90,7 @@ D = zeros(2);
 % K = place(A_1,B_1,[-2 -3])
 
 zeta= 0.7;
-ts= 0.2;
+ts= 1000;
 wn=-log(0.02)/(zeta*ts);
 
 pol=[1 2*zeta*wn wn^2];
@@ -98,7 +101,13 @@ p2 = r(2);
 
 %K = place(A_1,B_1,[p1 p2])  %NO FUNCIONA CON POLOS REPETIDOS
 
-K = place(A_1,B_1,[-50 -60])  %NO FUNCIONA CON POLOS REPETIDOS
+K = place(A_1,B_1,[-5 -60])  %NO FUNCIONA CON POLOS REPETIDOS
+% 
+% Alc=Ad-Bd*k;
+% P1=1/(Cd*(inv(eye(2)-(Alc)))*Bd)
+
+NumeDeno = ss(A_1,B_1,C,D);
+FuncionTransferencia = tf(NumeDeno);
 
 
 Anew=(A_1-B_1*K);
@@ -107,6 +116,6 @@ sys_K=ss(Anew,B_1,C,D);
 figure(2)
 step(sys_K)
 
-Ref = [16;15];
+Ref = [16;12];
 
 GK = K
